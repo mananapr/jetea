@@ -28,13 +28,13 @@ mod-tidy:
 
 help:
 	@echo "Makefile commands:"
-	@echo "  make        - Build the binary"
-	@echo "  make build  - Build the binary"
-	@echo "  make clean  - Clean the build directory"
-	@echo "  make run    - Build and run the binary"
-	@echo "  make fmt    - Format Go code"
-	@echo "  make lint   - Lint Go code"
-	@echo "  make tidy   - Format, lint, and tidy Go modules"
+	@echo "  make          - Build the binary"
+	@echo "  make build    - Build the binary"
+	@echo "  make clean    - Clean the build directory"
+	@echo "  make run      - Build and run the binary"
+	@echo "  make fmt      - Format Go code"
+	@echo "  make lint     - Lint Go code"
+	@echo "  make tidy     - Format, lint, and tidy Go modules"
 	@echo "  make mod-tidy - Tidy Go modules"
 
 .PHONY: all build clean run fmt lint tidy mod-tidy help

@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"os"
+	"time"
 
+	// tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/fang"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
@@ -16,7 +18,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:     "jetea",
 		Short:   "Jetea is a TUI for NATS.io",
-		Long:    `A TUI for NATS.io built with the Bubbletea in Go.`,
+		Long:    "A TUI for NATS.io built with the Bubbletea in Go.",
 		Version: version,
 		Args:    cobra.MaximumNArgs(1),
 	}
@@ -26,6 +28,28 @@ func Execute() {
 	if err := fang.Execute(context.Background(), rootCmd, fang.WithVersion(version), fang.WithoutCompletions(), fang.WithoutManpage()); err != nil {
 		os.Exit(1)
 	}
+}
+
+func initLogger(debug bool) *os.File {
+	var logFile *os.File
+
+	if debug {
+		newConfigFile, fileErr := os.OpenFile("debug.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
+		if fileErr == nil {
+			log.Info("Logging to debug.log")
+			log.SetOutput(newConfigFile)
+			log.SetTimeFormat(time.Kitchen)
+			log.SetReportCaller(true)
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.Fatal("Unable to open log file", "file", "debug.log", "error", fileErr)
+		}
+	} else {
+		log.SetOutput(os.Stderr)
+		log.SetLevel(log.FatalLevel)
+	}
+
+	return logFile
 }
 
 func init() {
@@ -42,6 +66,9 @@ func init() {
 		if err != nil {
 			log.Fatal("Cannot parse debug flag", "error", err)
 		}
-		log.Info("Initialized", "debug", debug)
+		logFile := initLogger(debug)
+		if logFile != nil {
+			defer logFile.Close()
+		}
 	}
 }
