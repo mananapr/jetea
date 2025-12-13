@@ -33,20 +33,20 @@ func Execute() {
 func initLogger(debug bool) *os.File {
 	var logFile *os.File
 
+	log.SetOutput(os.Stderr)
+	log.SetLevel(log.FatalLevel)
+
 	if debug {
 		newConfigFile, fileErr := os.OpenFile("debug.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
 		if fileErr == nil {
-			log.Info("Logging to debug.log")
-			log.SetOutput(newConfigFile)
 			log.SetTimeFormat(time.Kitchen)
-			log.SetReportCaller(true)
 			log.SetLevel(log.DebugLevel)
+			log.Info("Logging to debug.log")
+			log.SetReportCaller(true)
+			log.SetOutput(newConfigFile)
 		} else {
 			log.Fatal("Unable to open log file", "file", "debug.log", "error", fileErr)
 		}
-	} else {
-		log.SetOutput(os.Stderr)
-		log.SetLevel(log.FatalLevel)
 	}
 
 	return logFile
