@@ -38,9 +38,10 @@ func init() {
 	rootCmd.Flags().Bool("debug", false, "enable debug mode")
 
 	rootCmd.Run = func(_ *cobra.Command, args []string) {
-		_, err := rootCmd.Flags().GetBool("debug")
+		debug, err := rootCmd.Flags().GetBool("debug")
 		if err != nil {
 			log.Fatal("Cannot parse debug flag", "error", err)
 		}
+		log.Info("Initialized", "debug", debug)
 	}
 }
