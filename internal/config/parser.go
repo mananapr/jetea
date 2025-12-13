@@ -2,11 +2,13 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/mananapr/jetea/internal/util"
 
+	log "github.com/charmbracelet/log"
 	"github.com/go-playground/validator/v10"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -14,7 +16,15 @@ import (
 	yamlmarshaller "gopkg.in/yaml.v3"
 )
 
-var validate *validator.Validate
+const (
+	DEFAULT_XDG_CONFIG_DIRNAME = ".config"
+	JETEA_DIR                  = "jetea"
+	CONFIG_FILE_NAME           = "config.yml"
+)
+
+var (
+	validate *validator.Validate
+)
 
 type NATSConfig struct {
 	Name              *string `yaml:"name,omitempty" validate:"omitempty,max=100"`
@@ -50,13 +60,38 @@ func initParser() ConfigParser {
 }
 
 func LoadConfig(configPath string) (Config, error) {
+	var config Config
 	parser := initParser()
+
+	if configPath == "" {
+		configDir := os.Getenv("XDG_CONFIG_HOME")
+		if configDir == "" {
+			log.Debug("XDG_CONFIG_HOME not set")
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				return Config{}, err
+			}
+			configDir = filepath.Join(homeDir, DEFAULT_XDG_CONFIG_DIRNAME)
+		}
+
+		configFilePath := filepath.Join(configDir, JETEA_DIR, CONFIG_FILE_NAME)
+
+		if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+			log.Debug("writing default config", "path", configFilePath)
+			if defaultConfErr := parser.createDefaultConfigFile(configFilePath); defaultConfErr != nil {
+				return Config{}, defaultConfErr
+			}
+		} else {
+			log.Debug("using default config", "path", configFilePath)
+		}
+
+		configPath = configFilePath
+	}
 
 	if err := parser.k.Load(file.Provider(configPath), yaml.Parser()); err != nil {
 		return Config{}, err
 	}
 
-	var config Config
 	if err := parser.k.UnmarshalWithConf("", &config, koanf.UnmarshalConf{Tag: "yaml"}); err != nil {
 		return Config{}, err
 	}
@@ -83,7 +118,7 @@ func (parser ConfigParser) defaultConfig() Config {
 }
 
 func (parser ConfigParser) createDefaultConfigFile(configFilePath string) error {
-	if err := os.MkdirAll(configFilePath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(filepath.Dir(configFilePath), os.ModePerm); err != nil {
 		return err
 	}
 

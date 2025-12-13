@@ -17,14 +17,15 @@ type cfgErrorMsg struct {
 }
 
 type Model struct {
-	cfg string
-	msg string
+	cfgFlag string
+	cfg     config.Config
+	msg     string
 }
 
 func NewModel(cfgFlag string) Model {
 	m := Model{}
 	m.msg = "Hello World!"
-	m.cfg = cfgFlag
+	m.cfgFlag = cfgFlag
 
 	return m
 }
@@ -44,11 +45,13 @@ func showConfigError(err error) {
 }
 
 func (m *Model) initProgram() tea.Msg {
-	cfg, cfgErr := config.LoadConfig(m.cfg)
+	cfg, cfgErr := config.LoadConfig(m.cfgFlag)
 	if cfgErr != nil {
 		return cfgErrorMsg{err: cfgErr}
 	}
-	log.Debug("config fetched", "cfg", m.cfg, "pCfg", cfg)
+	m.cfg = cfg
+	log.Debug("config fetched")
+	log.Debug("server", "name", *m.cfg.NATSServers[0].Name)
 
 	return initMsg{}
 }

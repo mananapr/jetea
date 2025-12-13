@@ -70,7 +70,7 @@ func init() {
 
 		logFile := initLogger(debug)
 		if logFile != nil {
-			defer logFile.Close()
+			defer logFile.Close() // nolint: errcheck
 		}
 
 		model := ui.NewModel(cfgFlag)
