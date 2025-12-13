@@ -5,9 +5,10 @@ import (
 	"os"
 	"time"
 
-	// tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/fang"
 	"github.com/charmbracelet/log"
+	"github.com/mananapr/jetea/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +35,7 @@ func initLogger(debug bool) *os.File {
 	var logFile *os.File
 
 	log.SetOutput(os.Stderr)
-	log.SetLevel(log.FatalLevel)
+	log.SetLevel(log.ErrorLevel)
 
 	if debug {
 		newConfigFile, fileErr := os.OpenFile("debug.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
@@ -66,9 +67,23 @@ func init() {
 		if err != nil {
 			log.Fatal("Cannot parse debug flag", "error", err)
 		}
+
 		logFile := initLogger(debug)
 		if logFile != nil {
 			defer logFile.Close()
+		}
+
+		model := ui.NewModel(cfgFlag)
+
+		prog := tea.NewProgram(
+			model,
+			tea.WithAltScreen(),
+			tea.WithReportFocus(),
+			tea.WithMouseCellMotion(),
+		)
+
+		if _, err := prog.Run(); err != nil {
+			log.Fatal("Failed to start the TUI", "error", err)
 		}
 	}
 }
