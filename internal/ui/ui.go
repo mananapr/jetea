@@ -139,7 +139,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	}
 
-	return m, nil
+	var cmd tea.Cmd
+	_, cmd = m.views[m.currentSelection].Update(msg)
+	for i, v := range m.views {
+		if m.ctx.View == v.Type() {
+			m.currentSelection = i
+			break
+		}
+	}
+
+	return m, cmd
 }
 
 func (m Model) View() string {
