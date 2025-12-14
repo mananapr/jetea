@@ -105,6 +105,15 @@ func (m *Model) recalcLayout() {
 	}
 }
 
+func (m *Model) resizeActiveView() tea.Cmd {
+	return func() tea.Msg {
+		return tea.WindowSizeMsg{
+			Width:  m.ctx.ScreenWidth,
+			Height: m.ctx.ScreenHeight,
+		}
+	}
+}
+
 func (m Model) tabBarView() string {
 	var out []string
 
@@ -159,6 +168,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Help):
 			m.footer.ShowAll = !m.footer.ShowAll
 			m.recalcLayout()
+			return m, m.resizeActiveView()
 		case key.Matches(msg, m.keys.NextTab):
 			viewCount := len(m.views)
 			if m.currentSelection == viewCount-1 {
