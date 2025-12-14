@@ -10,6 +10,7 @@ import (
 	"github.com/mananapr/jetea/internal/ui/keys"
 	"github.com/mananapr/jetea/internal/ui/style"
 	"github.com/mananapr/jetea/internal/ui/theme"
+	"github.com/mananapr/jetea/internal/ui/view"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,23 +24,30 @@ type cfgErrorMsg struct {
 }
 
 type Model struct {
-	ctx    *context.AppContext
-	keys   *keys.KeyMap
-	footer footer.Model
+	ctx              *context.AppContext
+	keys             *keys.KeyMap
+	footer           footer.Model
+	views            []view.View
+	currentSelection int
 }
 
 func NewModel(cfgFlag string) Model {
 	m := Model{}
 
 	m.keys = keys.Keys
-
 	m.ctx = &context.AppContext{
 		ConfigFlag: cfgFlag,
 		View:       config.ServerSelectionView,
 		Theme:      theme.DefaultTheme,
 		Styles:     style.BuildStyles(theme.DefaultTheme),
 	}
-
+	m.views = []view.View{
+		view.NewServerView(m.ctx),
+		view.NewPubSubView(m.ctx),
+		view.NewJetstreamView(m.ctx),
+		view.NewRequestReplyView(m.ctx),
+	}
+	m.currentSelection = 0
 	m.footer = footer.NewModel(m.ctx)
 
 	return m
@@ -108,6 +116,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.keys.Help):
 			m.footer.ShowAll = !m.footer.ShowAll
+		case key.Matches(msg, m.keys.NextTab):
+			viewCount := len(m.views)
+			if m.currentSelection == viewCount-1 {
+				m.currentSelection = 0
+			} else {
+				m.currentSelection += 1
+			}
+			m.ctx.View = m.views[m.currentSelection].Type()
+		case key.Matches(msg, m.keys.PrevTab):
+			viewCount := len(m.views)
+			if m.currentSelection == 0 {
+				m.currentSelection = viewCount - 1
+			} else {
+				m.currentSelection -= 1
+			}
+			m.ctx.View = m.views[m.currentSelection].Type()
 		}
 
 	case tea.WindowSizeMsg:
@@ -119,7 +143,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Center, lipgloss.Center, "main content")
+	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Center, lipgloss.Center, m.views[m.currentSelection].View())
 	footer := m.footer.View()
 
 	return lipgloss.JoinVertical(lipgloss.Top, content, footer)
