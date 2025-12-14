@@ -86,6 +86,12 @@ func (m *Model) initProgram() tea.Msg {
 	}
 	m.ctx.Config = cfg
 
+	for _, v := range m.views {
+		if sv, ok := v.(*view.ServerView); ok {
+			sv.InitServerList()
+		}
+	}
+
 	return initMsg{}
 }
 
@@ -190,7 +196,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	tabs := m.tabBarView()
-	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Center, lipgloss.Center, m.views[m.currentSelection].View())
+	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Top, lipgloss.Top, m.views[m.currentSelection].View())
 	footer := m.footer.View()
 
 	return lipgloss.JoinVertical(lipgloss.Top, tabs, content, footer)
