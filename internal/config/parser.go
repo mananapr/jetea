@@ -16,6 +16,19 @@ import (
 	yamlmarshaller "gopkg.in/yaml.v3"
 )
 
+type ViewType string
+
+func (vt ViewType) String() string {
+	return string(vt)
+}
+
+const (
+	ServerSelectionView ViewType = "servers"
+	PubSubView          ViewType = "pubsub"
+	JetstreamView       ViewType = "jetstream"
+	RequestReplyView    ViewType = "requestreply"
+)
+
 const (
 	DEFAULT_XDG_CONFIG_DIRNAME = ".config"
 	JETEA_DIR                  = "jetea"

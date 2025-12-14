@@ -5,7 +5,13 @@ import (
 	"time"
 
 	"github.com/mananapr/jetea/internal/config"
+	"github.com/mananapr/jetea/internal/ui/context"
+	"github.com/mananapr/jetea/internal/ui/footer"
+	"github.com/mananapr/jetea/internal/ui/keys"
+	"github.com/mananapr/jetea/internal/ui/style"
+	"github.com/mananapr/jetea/internal/ui/theme"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	log "github.com/charmbracelet/log"
@@ -17,15 +23,24 @@ type cfgErrorMsg struct {
 }
 
 type Model struct {
-	cfgFlag string
-	cfg     config.Config
-	msg     string
+	ctx    *context.AppContext
+	keys   *keys.KeyMap
+	footer footer.Model
 }
 
 func NewModel(cfgFlag string) Model {
 	m := Model{}
-	m.msg = "Hello World!"
-	m.cfgFlag = cfgFlag
+
+	m.keys = keys.Keys
+
+	m.ctx = &context.AppContext{
+		ConfigFlag: cfgFlag,
+		View:       config.ServerSelectionView,
+		Theme:      theme.DefaultTheme,
+		Styles:     style.BuildStyles(theme.DefaultTheme),
+	}
+
+	m.footer = footer.NewModel(m.ctx)
 
 	return m
 }
@@ -45,15 +60,27 @@ func showConfigError(err error) {
 }
 
 func (m *Model) initProgram() tea.Msg {
-	cfg, cfgErr := config.LoadConfig(m.cfgFlag)
+	cfg, cfgErr := config.LoadConfig(m.ctx.ConfigFlag)
 	if cfgErr != nil {
 		return cfgErrorMsg{err: cfgErr}
 	}
-	m.cfg = cfg
-	log.Debug("config fetched")
-	log.Debug("server", "name", *m.cfg.NATSServers[0].Name)
+	m.ctx.Config = cfg
 
 	return initMsg{}
+}
+
+func (m *Model) handleWindowResize(msg tea.WindowSizeMsg) {
+	log.Info("window resized", "width", msg.Width, "height", msg.Height)
+	m.footer.SetWidth(msg.Width)
+	m.ctx.ScreenWidth = msg.Width
+	m.ctx.ScreenHeight = msg.Height
+	if m.footer.ShowAll {
+		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight
+	} else {
+		m.ctx.ContentHeight = msg.Height - style.FooterHeight
+	}
+	m.ctx.ContentWidth = msg.Width
+	log.Info("content resized", "width", m.ctx.ContentWidth, "height", m.ctx.ContentHeight)
 }
 
 func (m Model) Init() tea.Cmd {
@@ -76,17 +103,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		log.Debug("Key pressed", "key", msg.String())
 
-		if msg.String() == "q" || msg.String() == "ctrl+c" {
+		switch {
+		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
-		} else {
-			m.msg = "Key Pressed!!"
+		case key.Matches(msg, m.keys.Help):
+			m.footer.ShowAll = !m.footer.ShowAll
 		}
+
+	case tea.WindowSizeMsg:
+		m.handleWindowResize(msg)
+
 	}
 
 	return m, nil
 }
 
 func (m Model) View() string {
-	s := m.msg
-	return s
+	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Center, lipgloss.Center, "main content")
+	footer := m.footer.View()
+
+	return lipgloss.JoinVertical(lipgloss.Top, content, footer)
 }
