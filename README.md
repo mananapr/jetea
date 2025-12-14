@@ -1,12 +1,12 @@
 <h1 align="center">jetea</h1>
 <p align="center">
-  An elegant terminal UI for NATS Jetstream.
+  An elegant <i>(and WIP)</i> terminal UI for NATS Jetstream.
 </p>
 
 <br />
 
 
-## 🌟 Planner Features
+## 🌟 Planned Features
 
 - Multiple config-defined servers
 - Basic Pub/Sub operations
@@ -23,8 +23,8 @@
 
 ## Author
 
-Manan Singh [@mananapr](https://github.com/mananapr).
+Manan Singh [@mananapr](https://github.com/mananapr)
 
-## LICENSE
+## License
 
 MIT
