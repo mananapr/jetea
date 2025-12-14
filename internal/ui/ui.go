@@ -23,11 +23,17 @@ type cfgErrorMsg struct {
 	err error
 }
 
+type Tab struct {
+	View  config.ViewType
+	Title string
+}
+
 type Model struct {
 	ctx              *context.AppContext
 	keys             *keys.KeyMap
 	footer           footer.Model
 	views            []view.View
+	tabs             []Tab
 	currentSelection int
 }
 
@@ -46,6 +52,12 @@ func NewModel(cfgFlag string) Model {
 		view.NewPubSubView(m.ctx),
 		view.NewJetstreamView(m.ctx),
 		view.NewRequestReplyView(m.ctx),
+	}
+	m.tabs = []Tab{
+		{View: config.ServerSelectionView, Title: "Servers"},
+		{View: config.PubSubView, Title: "Pub/Sub"},
+		{View: config.JetstreamView, Title: "JetStream"},
+		{View: config.RequestReplyView, Title: "Req/Reply"},
 	}
 	m.currentSelection = 0
 	m.footer = footer.NewModel(m.ctx)
@@ -77,15 +89,29 @@ func (m *Model) initProgram() tea.Msg {
 	return initMsg{}
 }
 
+func (m Model) tabBarView() string {
+	var out []string
+
+	for i, tab := range m.tabs {
+		if i == m.currentSelection {
+			out = append(out, m.ctx.Styles.ActiveTabStyle.Render(tab.Title))
+		} else {
+			out = append(out, m.ctx.Styles.InactiveTabStyle.Render(tab.Title))
+		}
+	}
+
+	return lipgloss.JoinHorizontal(lipgloss.Top, out...)
+}
+
 func (m *Model) handleWindowResize(msg tea.WindowSizeMsg) {
 	log.Info("window resized", "width", msg.Width, "height", msg.Height)
 	m.footer.SetWidth(msg.Width)
 	m.ctx.ScreenWidth = msg.Width
 	m.ctx.ScreenHeight = msg.Height
 	if m.footer.ShowAll {
-		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight
+		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight - style.TabHeight
 	} else {
-		m.ctx.ContentHeight = msg.Height - style.FooterHeight
+		m.ctx.ContentHeight = msg.Height - style.FooterHeight - style.TabHeight
 	}
 	m.ctx.ContentWidth = msg.Width
 	log.Info("content resized", "width", m.ctx.ContentWidth, "height", m.ctx.ContentHeight)
@@ -152,8 +178,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	tabs := m.tabBarView()
 	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Center, lipgloss.Center, m.views[m.currentSelection].View())
 	footer := m.footer.View()
 
-	return lipgloss.JoinVertical(lipgloss.Top, content, footer)
+	return lipgloss.JoinVertical(lipgloss.Top, tabs, content, footer)
 }

@@ -9,13 +9,16 @@ import (
 var (
 	FooterHeight       = 1
 	ExpandedHelpHeight = 15
+	TabHeight          = 1
 )
 
 type AppStyles struct {
-	MainTextStyle  lipgloss.Style
-	FaintTextStyle lipgloss.Style
-	FooterStyle    lipgloss.Style
-	ErrorStyle     lipgloss.Style
+	MainTextStyle    lipgloss.Style
+	FaintTextStyle   lipgloss.Style
+	FooterStyle      lipgloss.Style
+	ActiveTabStyle   lipgloss.Style
+	InactiveTabStyle lipgloss.Style
+	ErrorStyle       lipgloss.Style
 
 	Help struct {
 		Text        lipgloss.Style
@@ -30,6 +33,8 @@ func BuildStyles(theme theme.Theme) AppStyles {
 	style.MainTextStyle = lipgloss.NewStyle().Foreground(theme.PrimaryText).Bold(true)
 	style.FaintTextStyle = lipgloss.NewStyle().Foreground(theme.FaintText)
 	style.FooterStyle = lipgloss.NewStyle().Background(theme.SelectedBackground).Height(FooterHeight)
+	style.ActiveTabStyle = lipgloss.NewStyle().Foreground(theme.PrimaryText).Background(theme.SelectedBackground).Bold(true).Padding(0, 2).Height(TabHeight)
+	style.InactiveTabStyle = lipgloss.NewStyle().Faint(true).Padding(0, 2).Height(TabHeight)
 
 	style.ErrorStyle = style.FooterStyle.Foreground(theme.ErrorText).MaxHeight(FooterHeight)
 
