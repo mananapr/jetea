@@ -89,6 +89,16 @@ func (m *Model) initProgram() tea.Msg {
 	return initMsg{}
 }
 
+func (m *Model) recalcLayout() {
+	h := m.ctx.ScreenHeight
+
+	if m.footer.ShowAll {
+		m.ctx.ContentHeight = h - style.ExpandedHelpHeight - style.TabHeight
+	} else {
+		m.ctx.ContentHeight = h - style.FooterHeight - style.TabHeight
+	}
+}
+
 func (m Model) tabBarView() string {
 	var out []string
 
@@ -142,6 +152,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.keys.Help):
 			m.footer.ShowAll = !m.footer.ShowAll
+			m.recalcLayout()
 		case key.Matches(msg, m.keys.NextTab):
 			viewCount := len(m.views)
 			if m.currentSelection == viewCount-1 {
