@@ -1,4 +1,4 @@
-<h1 align="center">cfiles</h1>
+<h1 align="center">jetea</h1>
 <p align="center">
   An elegant terminal UI for NATS Jetstream.
 </p>
