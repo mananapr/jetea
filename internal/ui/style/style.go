@@ -10,6 +10,7 @@ var (
 	FooterHeight       = 1
 	ExpandedHelpHeight = 10
 	TabHeight          = 1
+	ContentPaddingTop  = 1
 )
 
 type AppStyles struct {

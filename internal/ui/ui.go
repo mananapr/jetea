@@ -97,12 +97,8 @@ func (m *Model) initProgram() tea.Msg {
 
 func (m *Model) recalcLayout() {
 	h := m.ctx.ScreenHeight
-
-	if m.footer.ShowAll {
-		m.ctx.ContentHeight = h - style.ExpandedHelpHeight - style.TabHeight
-	} else {
-		m.ctx.ContentHeight = h - style.FooterHeight - style.TabHeight
-	}
+	footerHeight := lipgloss.Height(m.footer.View())
+	m.ctx.ContentHeight = h - footerHeight - style.TabHeight - style.ContentPaddingTop
 }
 
 func (m *Model) resizeActiveView() tea.Cmd {
@@ -134,9 +130,9 @@ func (m *Model) handleWindowResize(msg tea.WindowSizeMsg) {
 	m.ctx.ScreenWidth = msg.Width
 	m.ctx.ScreenHeight = msg.Height
 	if m.footer.ShowAll {
-		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight - style.TabHeight
+		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight - style.TabHeight - style.ContentPaddingTop
 	} else {
-		m.ctx.ContentHeight = msg.Height - style.FooterHeight - style.TabHeight
+		m.ctx.ContentHeight = msg.Height - style.FooterHeight - style.TabHeight - style.ContentPaddingTop
 	}
 	m.ctx.ContentWidth = msg.Width
 	log.Info("content resized", "width", m.ctx.ContentWidth, "height", m.ctx.ContentHeight)
@@ -206,7 +202,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	tabs := m.tabBarView()
-	content := lipgloss.Place(m.ctx.ContentWidth, m.ctx.ContentHeight, lipgloss.Top, lipgloss.Top, m.views[m.currentSelection].View())
+	content := lipgloss.NewStyle().Width(m.ctx.ContentWidth).Height(m.ctx.ContentHeight).Align(lipgloss.Top).PaddingTop(style.ContentPaddingTop).Render(m.views[m.currentSelection].View())
 	footer := m.footer.View()
 
 	return lipgloss.JoinVertical(lipgloss.Top, tabs, content, footer)

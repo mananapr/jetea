@@ -30,6 +30,7 @@ func NewServerView(ctx *context.AppContext) *ServerView {
 
 	l.KeyMap.ShowFullHelp.Unbind()
 	l.KeyMap.CloseFullHelp.Unbind()
+	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
 	l.SetShowTitle(false)
 	l.SetShowStatusBar(false)
@@ -84,5 +85,5 @@ func (m *ServerView) Update(msg tea.Msg) (View, tea.Cmd) {
 }
 
 func (m *ServerView) View() string {
-	return lipgloss.NewStyle().Margin(0, 0).Render(m.serverList.View())
+	return lipgloss.NewStyle().Render(m.serverList.View())
 }
