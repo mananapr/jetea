@@ -1,5 +1,7 @@
 <h1 align="center">jetea</h1>
-![screenshot](jetea.png)
+<p align="center">
+  <img src="jetea.png" alt="jetea screenshot" />
+</p>
 <p align="center">
   An elegant <i>(and WIP)</i> terminal UI for NATS Jetstream.
 </p>
