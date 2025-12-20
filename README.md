@@ -1,4 +1,5 @@
 <h1 align="center">jetea</h1>
+<img align="center" source="jetea.png"></img>
 <p align="center">
   An elegant <i>(and WIP)</i> terminal UI for NATS Jetstream.
 </p>

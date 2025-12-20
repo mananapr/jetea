@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mananapr/jetea/internal/config"
+	"github.com/mananapr/jetea/internal/nats"
 	"github.com/mananapr/jetea/internal/ui/context"
 	"github.com/mananapr/jetea/internal/ui/footer"
 	"github.com/mananapr/jetea/internal/ui/keys"
@@ -154,6 +155,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			},
 			tea.Quit,
 		)
+
+	case nats.ConnectedMsg:
+		m.ctx.NatsConnection = msg.Conn
+		m.ctx.ConnectedServer = &msg.ServerName
+		m.ctx.ConnectionStatus = context.NATSConnectionStatus.CONNECTED
+		log.Info("connected to NATS server", "server", msg.ServerName)
+		return m, nil
+
+	case nats.ConnectionErrorMsg:
+		m.ctx.NatsConnection = nil
+		m.ctx.ConnectedServer = nil
+		m.ctx.ConnectionStatus = context.NATSConnectionStatus.DISCONNECTED
+		m.ctx.Error = msg.Err
+		log.Error("failed to connect to NATS", "server", msg.ServerName, "error", msg.Err)
+		return m, nil
+
+	case nats.DisconnectedMsg:
+		m.ctx.NatsConnection = nil
+		m.ctx.ConnectedServer = nil
+		m.ctx.ConnectionStatus = context.NATSConnectionStatus.DISCONNECTED
+		log.Info("disconnected from NATS server", "server", msg.ServerName)
+		return m, nil
 
 	case tea.KeyMsg:
 		log.Debug("Key pressed", "key", msg.String())

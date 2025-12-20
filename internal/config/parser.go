@@ -6,8 +6,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mananapr/jetea/internal/util"
-
 	log "github.com/charmbracelet/log"
 	"github.com/go-playground/validator/v10"
 	"github.com/knadh/koanf/parsers/yaml"
@@ -40,7 +38,7 @@ var (
 )
 
 type NATSConfig struct {
-	Name              *string `yaml:"name,omitempty" validate:"omitempty,max=100"`
+	Name              string  `yaml:"name" validate:"required,max=100"`
 	Hostname          string  `yaml:"hostname" validate:"required,hostname_port"`
 	User              *string `yaml:"user,omitempty" validate:"omitempty,max=100"`
 	Password          *string `yaml:"password,omitempty" validate:"omitempty,max=100"`
@@ -120,7 +118,7 @@ func (parser ConfigParser) defaultConfig() Config {
 	return Config{
 		NATSServers: []NATSConfig{
 			{
-				Name:              util.StringPtr("Default Server"),
+				Name:              "Default Server",
 				Hostname:          "localhost:4222",
 				TLS:               false,
 				TimeoutSeconds:    10,
