@@ -29,7 +29,10 @@ type ServerView struct {
 }
 
 func NewServerView(ctx *context.AppContext) *ServerView {
-	l := list.New(nil, list.NewDefaultDelegate(), 1, 1)
+	d := list.NewDefaultDelegate()
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.Foreground(ctx.Theme.WarningText).BorderLeftForeground(ctx.Theme.WarningText)
+	d.Styles.SelectedDesc = d.Styles.SelectedDesc.Foreground(ctx.Theme.WarningText).BorderLeftForeground(ctx.Theme.WarningText)
+	l := list.New(nil, d, 1, 1)
 
 	l.KeyMap.ShowFullHelp.Unbind()
 	l.KeyMap.CloseFullHelp.Unbind()

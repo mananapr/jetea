@@ -19,15 +19,15 @@ type Theme struct {
 }
 
 var DefaultTheme = Theme{
-	PrimaryBorder:      lipgloss.AdaptiveColor{Light: "013", Dark: "008"},
-	SecondaryBorder:    lipgloss.AdaptiveColor{Light: "008", Dark: "007"},
-	SelectedBackground: lipgloss.AdaptiveColor{Light: "006", Dark: "008"},
-	FaintBorder:        lipgloss.AdaptiveColor{Light: "254", Dark: "000"},
-	PrimaryText:        lipgloss.AdaptiveColor{Light: "000", Dark: "015"},
-	SecondaryText:      lipgloss.AdaptiveColor{Light: "244", Dark: "251"},
-	FaintText:          lipgloss.AdaptiveColor{Light: "007", Dark: "245"},
-	InvertedText:       lipgloss.AdaptiveColor{Light: "015", Dark: "236"},
-	SuccessText:        lipgloss.AdaptiveColor{Light: "002", Dark: "002"},
-	WarningText:        lipgloss.AdaptiveColor{Light: "003", Dark: "003"},
-	ErrorText:          lipgloss.AdaptiveColor{Light: "001", Dark: "001"},
+	PrimaryBorder:      lipgloss.AdaptiveColor{Light: "13", Dark: "8"},
+	SecondaryBorder:    lipgloss.AdaptiveColor{Light: "8", Dark: "11"},
+	SelectedBackground: lipgloss.AdaptiveColor{Light: "6", Dark: "8"},
+	FaintBorder:        lipgloss.AdaptiveColor{Light: "7", Dark: "8"},
+	PrimaryText:        lipgloss.AdaptiveColor{Light: "0", Dark: "15"},
+	SecondaryText:      lipgloss.AdaptiveColor{Light: "8", Dark: "7"},
+	FaintText:          lipgloss.AdaptiveColor{Light: "7", Dark: "7"},
+	InvertedText:       lipgloss.AdaptiveColor{Light: "15", Dark: "0"},
+	SuccessText:        lipgloss.AdaptiveColor{Light: "2", Dark: "2"},
+	WarningText:        lipgloss.AdaptiveColor{Light: "3", Dark: "3"},
+	ErrorText:          lipgloss.AdaptiveColor{Light: "1", Dark: "1"},
 }

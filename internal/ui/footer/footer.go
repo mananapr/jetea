@@ -1,7 +1,6 @@
 package footer
 
 import (
-	"fmt"
 	"strings"
 
 	bHelp "github.com/charmbracelet/bubbles/help"
@@ -38,39 +37,42 @@ func (m Model) View() string {
 	var footer string
 
 	helpIndicator := lipgloss.NewStyle().
-		Background(m.ctx.Theme.FaintText).
-		Foreground(m.ctx.Theme.SelectedBackground).
+		Background(m.ctx.Theme.SecondaryBorder).
+		Foreground(m.ctx.Theme.PrimaryText).
 		Padding(0, 1).
 		Render("? help")
 
 	connectedIndicator := lipgloss.NewStyle().
 		Background(m.ctx.Theme.SuccessText).
-		Foreground(m.ctx.Theme.PrimaryText).
+		Foreground(m.ctx.Theme.FaintBorder).
 		Padding(0, 1)
 
 	connectingIndicator := lipgloss.NewStyle().
 		Background(m.ctx.Theme.WarningText).
+		Foreground(m.ctx.Theme.FaintBorder).
+		Padding(0, 1)
+
+	serverNameIndicator := lipgloss.NewStyle().
+		Background(m.ctx.Theme.SecondaryBorder).
 		Foreground(m.ctx.Theme.PrimaryText).
 		Padding(0, 1)
 
 	disconnectedIndicator := lipgloss.NewStyle().
 		Background(m.ctx.Theme.ErrorText).
-		Foreground(m.ctx.Theme.PrimaryText).
+		Foreground(m.ctx.Theme.FaintBorder).
 		Padding(0, 1)
 
 	leftSection := ""
 	if m.ctx.ConnectedServer != nil {
 		switch m.ctx.ConnectionStatus {
 		case context.NATSConnectionStatus.CONNECTED:
-			m.leftSection = util.StringPtr(connectedIndicator.Render(fmt.Sprintf("Connected: %s", *m.ctx.ConnectedServer)))
+			m.leftSection = util.StringPtr(connectedIndicator.Render("CONNECTED") + serverNameIndicator.Render(*m.ctx.ConnectedServer))
 		case context.NATSConnectionStatus.CONNECTING:
-			m.leftSection = util.StringPtr(connectingIndicator.Render(fmt.Sprintf("Connecting: %s", *m.ctx.ConnectedServer)))
-		case context.NATSConnectionStatus.DISCONNECTED:
-			m.leftSection = util.StringPtr(fmt.Sprintf("Disconnected: %s", disconnectedIndicator.Render(*m.ctx.ConnectedServer)))
+			m.leftSection = util.StringPtr(connectingIndicator.Render("CONNECTING") + serverNameIndicator.Render(*m.ctx.ConnectedServer))
 		}
 		log.Info("connection status", "status", m.ctx.ConnectionStatus)
 	} else {
-		m.leftSection = util.StringPtr(disconnectedIndicator.Render("Disconnected"))
+		m.leftSection = util.StringPtr(disconnectedIndicator.Render("DISCONNECTED"))
 	}
 	if m.leftSection != nil {
 		leftSection = *m.leftSection
