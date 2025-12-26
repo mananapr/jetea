@@ -99,7 +99,7 @@ func (m *Model) initProgram() tea.Msg {
 func (m *Model) recalcLayout() {
 	h := m.ctx.ScreenHeight
 	footerHeight := lipgloss.Height(m.footer.View())
-	m.ctx.ContentHeight = h - footerHeight - style.TabHeight - style.ContentPaddingTop
+	m.ctx.ContentHeight = h - footerHeight - style.TabHeight
 }
 
 func (m *Model) resizeActiveView() tea.Cmd {
@@ -131,9 +131,9 @@ func (m *Model) handleWindowResize(msg tea.WindowSizeMsg) {
 	m.ctx.ScreenWidth = msg.Width
 	m.ctx.ScreenHeight = msg.Height
 	if m.footer.ShowAll {
-		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight - style.TabHeight - style.ContentPaddingTop
+		m.ctx.ContentHeight = msg.Height - style.ExpandedHelpHeight - style.TabHeight
 	} else {
-		m.ctx.ContentHeight = msg.Height - style.FooterHeight - style.TabHeight - style.ContentPaddingTop
+		m.ctx.ContentHeight = msg.Height - style.FooterHeight - style.TabHeight
 	}
 	m.ctx.ContentWidth = msg.Width
 	log.Info("content resized", "width", m.ctx.ContentWidth, "height", m.ctx.ContentHeight)
@@ -184,6 +184,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
+		case key.Matches(msg, m.keys.Refresh):
+			return m, tea.ClearScreen
 		case key.Matches(msg, m.keys.Help):
 			m.footer.ShowAll = !m.footer.ShowAll
 			m.recalcLayout()

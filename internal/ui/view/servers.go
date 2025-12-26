@@ -77,7 +77,7 @@ func (m *ServerView) Init() tea.Cmd {
 func (m *ServerView) Update(msg tea.Msg) (View, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.serverList.SetSize(m.ctx.ContentWidth, m.ctx.ContentHeight)
+		m.serverList.SetSize(m.ctx.ContentWidth, m.ctx.ContentHeight-1)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.ServerKeys.Select):

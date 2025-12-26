@@ -3,6 +3,7 @@ package view
 import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mananapr/jetea/internal/config"
 	"github.com/mananapr/jetea/internal/ui/context"
 	"github.com/mananapr/jetea/internal/ui/keys"
@@ -36,5 +37,5 @@ func (m *PubSubView) Update(msg tea.Msg) (View, tea.Cmd) {
 }
 
 func (m *PubSubView) View() string {
-	return "PubSub View"
+	return lipgloss.NewStyle().Render("PubSub View")
 }
