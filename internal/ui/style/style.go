@@ -8,7 +8,7 @@ import (
 
 var (
 	FooterHeight       = 1
-	ExpandedHelpHeight = 10
+	ExpandedHelpHeight = 8
 	TabHeight          = 1
 	ContentPaddingTop  = 1
 )

@@ -63,6 +63,7 @@ func (m Model) View() string {
 		Padding(0, 1)
 
 	leftSection := ""
+	errorSection := ""
 	if m.ctx.ConnectedServer != nil {
 		switch m.ctx.ConnectionStatus {
 		case context.NATSConnectionStatus.CONNECTED:
@@ -74,8 +75,11 @@ func (m Model) View() string {
 	} else {
 		m.leftSection = util.StringPtr(disconnectedIndicator.Render("DISCONNECTED"))
 	}
+	if m.ctx.Error != nil {
+		errorSection = lipgloss.NewStyle().Background(m.ctx.Theme.SelectedBackground).Foreground(m.ctx.Theme.ErrorText).Padding(0, 1).Render(m.ctx.Error.Error())
+	}
 	if m.leftSection != nil {
-		leftSection = *m.leftSection
+		leftSection = *m.leftSection + errorSection
 	}
 	rightSection := ""
 	if m.rightSection != nil {
@@ -103,11 +107,6 @@ func (m Model) View() string {
 
 func (m *Model) SetWidth(width int) {
 	m.help.Width = width
-}
-
-func (m *Model) UpdateProgramContext(ctx *context.AppContext) {
-	m.ctx = ctx
-	m.help.Styles = ctx.Styles.Help.BubbleStyle
 }
 
 func (m *Model) SetLeftSection(leftSection string) {

@@ -168,7 +168,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ctx.ConnectedServer = nil
 		m.ctx.ConnectionStatus = context.NATSConnectionStatus.DISCONNECTED
 		m.ctx.Error = msg.Err
-		log.Error("failed to connect to NATS", "server", msg.ServerName, "error", msg.Err)
+		log.Info("failed to connect to NATS", "server", msg.ServerName, "error", msg.Err)
 		return m, nil
 
 	case nats.DisconnectedMsg:
@@ -180,6 +180,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		log.Debug("Key pressed", "key", msg.String())
+		m.ctx.Error = nil
 
 		switch {
 		case key.Matches(msg, m.keys.Quit):
