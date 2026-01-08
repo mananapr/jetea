@@ -21,3 +21,13 @@ type ConnectionErrorMsg struct {
 type DisconnectedMsg struct {
 	ServerName string
 }
+
+type MsgReceived struct {
+	Body string
+}
+
+type SubscribedMsg struct {
+	Subject string
+}
+
+type UnsubscribedMsg struct{}

@@ -5,19 +5,31 @@ import (
 )
 
 type PubSubKeyMap struct {
-	Select key.Binding
+	Submit      key.Binding
+	Subscribe   key.Binding
+	Unsubscribe key.Binding
 }
 
 var PubSubKeys = &PubSubKeyMap{
-	Select: key.NewBinding(
+	Submit: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("enter", "select pub/sub"),
+		key.WithHelp("enter", "submit subject for sub"),
+	),
+	Subscribe: key.NewBinding(
+		key.WithKeys("s"),
+		key.WithHelp("s", "subscribe to a subject"),
+	),
+	Unsubscribe: key.NewBinding(
+		key.WithKeys("u"),
+		key.WithHelp("u", "unsubscribe"),
 	),
 }
 
 func PubSubFullHelp() []key.Binding {
 
 	return []key.Binding{
-		PubSubKeys.Select,
+		PubSubKeys.Submit,
+		PubSubKeys.Subscribe,
+		PubSubKeys.Unsubscribe,
 	}
 }

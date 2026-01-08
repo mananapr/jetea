@@ -1,6 +1,7 @@
 package context
 
 import (
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/mananapr/jetea/internal/config"
 	"github.com/mananapr/jetea/internal/ui/style"
 	"github.com/mananapr/jetea/internal/ui/theme"
@@ -8,6 +9,7 @@ import (
 )
 
 type NATSConnectionStatusType string
+type SubscriptionStatusType int
 
 var NATSConnectionStatus = struct {
 	CONNECTED    NATSConnectionStatusType
@@ -19,7 +21,18 @@ var NATSConnectionStatus = struct {
 	DISCONNECTED: "disconnected",
 }
 
+var SubscriptionStatus = struct {
+	UNSUBSCRIBED SubscriptionStatusType
+	SUBSCRIBING  SubscriptionStatusType
+	SUBSCRIBED   SubscriptionStatusType
+}{
+	UNSUBSCRIBED: 0,
+	SUBSCRIBING:  1,
+	SUBSCRIBED:   2,
+}
+
 type AppContext struct {
+	Program          *tea.Program
 	ScreenHeight     int
 	ScreenWidth      int
 	ContentWidth     int
@@ -31,6 +44,11 @@ type AppContext struct {
 	Styles           style.AppStyles
 	Error            error
 	NatsConnection   *nats.Conn
+	ActiveSub        *nats.Subscription
+	ActiveInput      bool
 	ConnectedServer  *string
 	ConnectionStatus NATSConnectionStatusType
+	SubStatus        SubscriptionStatusType
+	SubSubject       string
+	Messages         []string
 }

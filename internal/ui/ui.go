@@ -38,6 +38,10 @@ type Model struct {
 	currentSelection int
 }
 
+func (m *Model) SetProgram(prog *tea.Program) {
+	m.ctx.Program = prog
+}
+
 func NewModel(cfgFlag string) Model {
 	m := Model{}
 
@@ -172,9 +176,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case nats.DisconnectedMsg:
+		if m.ctx.ActiveSub != nil {
+			_ = m.ctx.ActiveSub.Unsubscribe()
+			m.ctx.ActiveSub = nil
+		}
 		m.ctx.NatsConnection = nil
 		m.ctx.ConnectedServer = nil
 		m.ctx.ConnectionStatus = context.NATSConnectionStatus.DISCONNECTED
+		m.ctx.SubStatus = context.SubscriptionStatus.UNSUBSCRIBED
 		log.Info("disconnected from NATS server", "server", msg.ServerName)
 		return m, nil
 
@@ -183,6 +192,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ctx.Error = nil
 
 		switch {
+		case m.ctx.ActiveInput:
+			break
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
 		case key.Matches(msg, m.keys.Refresh):
@@ -211,11 +222,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.handleWindowResize(msg)
+		for _, v := range m.views {
+			v.Update(msg)
+		}
 
+	case nats.MsgReceived:
+		for _, v := range m.views {
+			v.Update(msg)
+		}
+		return m, nil
 	}
 
 	var cmd tea.Cmd
 	_, cmd = m.views[m.currentSelection].Update(msg)
+
 	for i, v := range m.views {
 		if m.ctx.View == v.Type() {
 			m.currentSelection = i

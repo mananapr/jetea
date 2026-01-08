@@ -82,6 +82,8 @@ func init() {
 			tea.WithMouseCellMotion(),
 		)
 
+		model.SetProgram(prog)
+
 		if _, err := prog.Run(); err != nil {
 			log.Fatal("Failed to start the TUI", "error", err)
 		}
