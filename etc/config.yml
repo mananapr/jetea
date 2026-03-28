@@ -1,0 +1,14 @@
+servers:
+  - name: "Default Server"
+    hostname: "localhost:4222"
+    tls: false
+    timeout_seconds: 30
+    reconnect_attempts: 3
+
+  - name: "Auth Server"
+    hostname: "localhost:4222"
+    user: "root"
+    password: "root"
+    tls: false
+    timeout_seconds: 30
+    reconnect_attempts: 3
